@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request
+from flask import Flask, jsonify, render_template, request
 import os
 from google import genai
 from google.genai import types
@@ -15,10 +15,9 @@ def chat():
     if request.method == "GET":
         return render_template('chatbot.html', response="")
     else:
-        user_input = request.form.get('message')
+        user_input = request.json["message"]
         print("post request received")
 
-        print (user_input)
         if user_input:
             response = client.models.generate_content(
             model="gemini-2.0-flash",
@@ -28,9 +27,10 @@ def chat():
             )
             )
             response_text = response.text
+            print("Response: \n", response_text)
         else:
             response_text = "No input provided."
 
-        return render_template('chatbot.html', response=response_text)
+        return jsonify({"response": response_text})
     
 app.run(debug=True)  # Start the server
