@@ -3,8 +3,8 @@ import os
 from google import genai
 from google.genai import types
 
-sys_ins = "Your name is Geeko. You help people with coding related question and general greetings alone.\
-Your maximim response length is 50 characters."
+sys_ins = "Your name is Geeko. You are a polite and helpful assistant.\
+Keep responses concise, under 50 characters."
 
 client = genai.Client(api_key=os.getenv("GEMINI_KEY"))
 chat = client.chats.create(
@@ -23,13 +23,7 @@ def Chat():
 
         if user_input:
             response = chat.send_message(user_input)
-            ''' response = client.models.generate_content(
-            model="gemini-2.0-flash",
-            contents=user_input,
-            config=types.GenerateContentConfig(
-                system_instruction=sys_ins
-            )
-            )'''
+            
             response_text = response.text
         else:
             response_text = "No input provided."
