@@ -1,18 +1,42 @@
 # FlaskBot
-A simple Flask chatboot application powered by Gemini 2.0 Flash
+A simple Flask chatbot application powered by Gemini 2.0 Flash.
 
-# Installation
-Move to the flaskbot repo
-cd <path to cloned folder>
+## Installation
 
-Setting up a virtual environment using the Python venv command.
+### Clone the Repository
+```sh
+cd <path/to/your/directory>
+git clone <repository-url>
+cd flaskbot
+```
+
+### Set Up a Virtual Environment
+Create a virtual environment using Python's `venv` module:
+```sh
 python -m venv venv
+```
 
-Activate Virtual Environmnet
-venv\Scripts\activate
+Activate the virtual environment:
+- On Windows:
+  ```sh
+  venv\Scripts\activate
+  ```
+- On macOS/Linux:
+  ```sh
+  source venv/bin/activate
+  ```
 
-install all the required modules
-pip install requirements .txt
+### Install Dependencies
+Install all required modules from `requirements.txt`:
+```sh
+pip install -r requirements.txt
+```
 
-# Run Flask App in Your Local Machine
+## Running the Flask App
+Run the Flask application locally:
+```sh
 python app.py
+```
+
+The application should now be accessible on `http://127.0.0.1:5000/`.
+
