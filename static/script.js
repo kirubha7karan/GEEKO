@@ -3,6 +3,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const messageContainer = document.getElementById('chatbot-messages');
   const userInput = document.getElementById('user-input');
   const sendButton = document.getElementById('send-btn');
+  const testingAssit = document.getElementById('test-asst');
+  let testAssistance = false;
 
   // Function to add a message to the chat
   function addMessage(text, isUser, isLoader = false) {
@@ -39,7 +41,7 @@ document.addEventListener('DOMContentLoaded', () => {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ message: userText }),
+      body: JSON.stringify({ message: userText, testAssistance: testAssistance }),
     })
       .then((response) => response.json())
       .then((data) => {
@@ -73,6 +75,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  async function enableTestAssistance() {
+    testAssistance = !testAssistance;
+    testingAssit.style.backgroundColor = testAssistance ? 'blue' : 'grey';
+  }
+
   // Event listeners
   sendButton.addEventListener('click', handleUserInput);
   userInput.addEventListener('keypress', (e) => {
@@ -80,4 +87,11 @@ document.addEventListener('DOMContentLoaded', () => {
       handleUserInput();
     }
   });
+  testingAssit.addEventListener('click', enableTestAssistance);
+  testingAssit.onmouseover = () => {
+    testingAssit.style.backgroundColor = testAssistance ? '#0056b3' : 'darkgrey';
+  };
+  testingAssit.onmouseout = () => {
+    testingAssit.style.backgroundColor = testAssistance ? '#007bff' : 'grey';
+  };
 });

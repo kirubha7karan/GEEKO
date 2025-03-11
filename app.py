@@ -12,7 +12,12 @@ import json
 # sys_ins = "Your name is Geeko. You are a polite and helpful assistant.\
 # Keep responses concise, under 50 characters."
 
-sys_ins = "# Geeko 2.0 - System Instruction\
+global role, chat, test_assitant, bot
+role = "bot"
+chat = None
+client = genai.Client(api_key=os.getenv("GEMINI_KEY"))
+
+test_assitant = "# Geeko 2.0 - System Instruction\
 You are **Geeko 2.0**, a helpful testing assistant responsible for explaining **autocomplete** and **geocoding** test cases of the *Nuwa* application.\
 ## Behavior Guidelines\
 - Respond politely to general greetings.  \
@@ -26,11 +31,17 @@ You are **Geeko 2.0**, a helpful testing assistant responsible for explaining **
 3. **Do not mention test case IDs** unless explicitly requested by the user.  \
 4. **If the user provides a specific test case ID** and asks for an explanation, explain *only that test case*."
 
+bot = "# Geeko 2.0 - System Instruction\
+You are **Geeko 2.0**, a helpful assitant\
+## Behavior Guidelines\
+- Respond politely to general greetings.  \
+- Maintain professionalism and clarity in responses."
 
-client = genai.Client(api_key=os.getenv("GEMINI_KEY"))
-chat = client.chats.create(
+def create_new_chat(role):
+    global chat
+    chat = client.chats.create(
         model="gemini-2.0-flash", 
-        config=types.GenerateContentConfig(system_instruction=sys_ins)
+        config=types.GenerateContentConfig(system_instruction=role)
         )
 
 # Load Embedding Model
@@ -73,22 +84,39 @@ faiss_index = create_faiss_index(embeddings)
 
 app = Flask(__name__)
 
+
 @app.route('/',methods=["GET","POST"])
 def Chat():
+    global role, chat, test_assitant, bot
     if request.method == "GET":
         return render_template('chatbot.html', response="")
     else:
         user_input = request.json["message"]
+        test_assist = request.json["testAssistance"]
+        
+        if test_assist and role != "test_assitant":
+            role = "test_assitant"
+            create_new_chat(test_assitant)
+        elif not test_assist and role != "bot":
+            role = "bot"
+            create_new_chat(bot)
+            
         if user_input:
-            query_embedding = embedding_model.encode([user_input])
-            D, I = faiss_index.search(np.array(query_embedding), k=5)
-            results = test_cases.iloc[I[0]][["externalid", "summary", "preconditions", "combined_text"]].to_dict(orient="records")
-            user_txt = json.dumps({"query": user_input, "results": results})
-            response = chat.send_message(user_txt)
-            response_text = response.text
+            if request.json["testAssistance"]:                 
+                query_embedding = embedding_model.encode([user_input])
+                D, I = faiss_index.search(np.array(query_embedding), k=5)
+                results = test_cases.iloc[I[0]][["externalid", "summary", "preconditions", "combined_text"]].to_dict(orient="records")
+                user_txt = json.dumps({"query": user_input, "results": results})
+                response = chat.send_message(user_txt)
+                response_text = response.text
+            else:
+                response = chat.send_message(user_input)
+                response_text = response.text
+                
         else:
             response_text = "No input provided."
 
         return jsonify({"response": response_text})
-    
+
+create_new_chat(role)
 app.run(debug=True)  # Start the server
