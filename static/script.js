@@ -4,6 +4,10 @@ document.addEventListener('DOMContentLoaded', () => {
   const userInput = document.getElementById('user-input');
   const sendButton = document.getElementById('send-btn');
   const testingAssit = document.getElementById('test-asst');
+  const csvFileInput = document.getElementById('csv-file');
+  const csvBlock = document.getElementsByClassName('csv-upload')[0];
+  csvBlock.style.display = 'none';
+  const uploadButton = document.getElementById('upload-btn');
   let testAssistance = false;
 
   // Function to add a message to the chat
@@ -72,12 +76,17 @@ document.addEventListener('DOMContentLoaded', () => {
       messageContainer.lastChild.remove(); // Remove loader
       addMessage(botResponse, false); // Add bot response
       userInput.disabled = false;
+      userInput.focus();
     }
   }
 
   async function enableTestAssistance() {
     testAssistance = !testAssistance;
     testingAssit.style.backgroundColor = testAssistance ? 'blue' : 'grey';
+    if (testAssistance)
+      csvBlock.style.display = 'flex';
+    else
+      csvBlock.style.display = 'none';
   }
 
   // Event listeners
@@ -94,4 +103,43 @@ document.addEventListener('DOMContentLoaded', () => {
   testingAssit.onmouseout = () => {
     testingAssit.style.backgroundColor = testAssistance ? '#007bff' : 'grey';
   };
+
+  uploadButton.addEventListener('click', () => {
+    const file = csvFileInput.files[0];
+    if (file) {
+      const reader = new FileReader();
+  
+      reader.onload = async (event) => {
+        const csvData = event.target.result;
+  
+        try {
+          const response = await fetch("/file", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ file: csvData }),
+          });
+  
+          const data = await response.json();
+          console.log(data.response);
+          if (data.response.includes("success")) {
+            alert(`CSV file uploaded successfully`, false);
+
+          }
+          else{
+            alert(data.response, false);
+          }
+        } catch (error) {
+          console.error("Error:", error);
+          alert("Sorry, please review your csv file, There was an error processing your CSV file.", false);
+        }
+      };
+  
+      reader.readAsText(file);
+    } else {
+      alert('Please select a CSV file to upload.', false);
+    }
+  });
+
 });

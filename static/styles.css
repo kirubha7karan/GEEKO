@@ -116,3 +116,33 @@ body {
 #test-asst{
   background-color: grey
 }
+
+/* styles.css */
+/* Add this to your existing CSS */
+.csv-upload {
+  padding: 10px;
+  background-color: #f9f9f9;
+  border-top: 1px solid #ddd;
+  display: flex;
+  gap: 10px;
+}
+
+.csv-upload input[type="file"] {
+  flex: 1;
+  padding: 5px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+}
+
+.csv-upload button {
+  padding: 5px 10px;
+  background-color: #28a745;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.csv-upload button:hover {
+  background-color: #218838;
+}
