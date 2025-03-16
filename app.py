@@ -22,11 +22,10 @@ test_cases = ""
 client = genai.Client(api_key=os.getenv("GEMINI_KEY"))
 
 test_assitant = "# Geeko 2.0 - System Instruction\
-You are **Geeko 2.0**, a helpful testing assistant responsible for test cases of the *Armor* application.\
+You are **Geeko 2.0**, a helpful testing assistant responsible for test cases of the *uploaded* application.\
 ## Behavior Guidelines\
 - Respond politely to general greetings.  \
 - Maintain professionalism and clarity in responses.  \
-- Only discuss *autocomplete* and *geocoding* test cases.\
 \
 ## Response Rules\
 1. **If a user asks what you can do**, reply:  \
