@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Chatbot Interface</title>
   <link rel="stylesheet" href="../static/styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </head>
 <body>
   <div class="chatbot-container">
@@ -17,6 +18,11 @@
     <div class="chatbot-input">
       <input type="text" id="user-input" placeholder="Type your message...">
       <button id="send-btn">Send</button>
+      <button id="test-asst" class="test-asst"  >Testing Assist</button>
+    </div>
+    <div class="xml-upload">
+      <input type="file" id="xml-file" accept=".xml">
+      <button id="upload-btn">Upload XML</button>
     </div>
   </div>
 

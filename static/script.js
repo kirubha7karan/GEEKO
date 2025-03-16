@@ -3,6 +3,12 @@ document.addEventListener('DOMContentLoaded', () => {
   const messageContainer = document.getElementById('chatbot-messages');
   const userInput = document.getElementById('user-input');
   const sendButton = document.getElementById('send-btn');
+  const testingAssit = document.getElementById('test-asst');
+  const xmlFileInput = document.getElementById('xml-file');
+  const xmlBlock = document.getElementsByClassName('xml-upload')[0];
+  xmlBlock.style.display = 'none';
+  const uploadButton = document.getElementById('upload-btn');
+  let testAssistance = false;
 
   // Function to add a message to the chat
   function addMessage(text, isUser, isLoader = false) {
@@ -18,6 +24,11 @@ document.addEventListener('DOMContentLoaded', () => {
       // Add regular message text
       const messageText = document.createElement('p');
       messageText.textContent = text;
+      if (!isUser) {
+        messageText.innerHTML = marked.parse(text);
+      } else {
+        messageText.textContent = text;
+      }
       messageDiv.appendChild(messageText);
     }
 
@@ -34,7 +45,7 @@ document.addEventListener('DOMContentLoaded', () => {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ message: userText }),
+      body: JSON.stringify({ message: userText, testAssistance: testAssistance }),
     })
       .then((response) => response.json())
       .then((data) => {
@@ -65,7 +76,17 @@ document.addEventListener('DOMContentLoaded', () => {
       messageContainer.lastChild.remove(); // Remove loader
       addMessage(botResponse, false); // Add bot response
       userInput.disabled = false;
+      userInput.focus();
     }
+  }
+
+  async function enableTestAssistance() {
+    testAssistance = !testAssistance;
+    testingAssit.style.backgroundColor = testAssistance ? 'blue' : 'grey';
+    if (testAssistance)
+      xmlBlock.style.display = 'flex';
+    else
+      xmlBlock.style.display = 'none';
   }
 
   // Event listeners
@@ -75,4 +96,50 @@ document.addEventListener('DOMContentLoaded', () => {
       handleUserInput();
     }
   });
+  testingAssit.addEventListener('click', enableTestAssistance);
+  testingAssit.onmouseover = () => {
+    testingAssit.style.backgroundColor = testAssistance ? '#0056b3' : 'darkgrey';
+  };
+  testingAssit.onmouseout = () => {
+    testingAssit.style.backgroundColor = testAssistance ? '#007bff' : 'grey';
+  };
+
+  uploadButton.addEventListener('click', () => {
+    const file = xmlFileInput.files[0];
+    if (file) {
+      const reader = new FileReader();
+  
+      reader.onload = async (event) => {
+        const xmlData = event.target.result;
+  
+        try {
+          const response = await fetch("/file", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ file: xmlData }),
+          });
+  
+          const data = await response.json();
+          console.log(data.response);
+          if (data.response.includes("success")) {
+            alert(`XML file uploaded successfully`, false);
+
+          }
+          else{
+            alert(data.response, false);
+          }
+        } catch (error) {
+          console.error("Error:", error);
+          alert("Sorry, please review your XML file, There was an error processing your file.", false);
+        }
+      };
+  
+      reader.readAsText(file);
+    } else {
+      alert('Please select a XML file to upload.', false);
+    }
+  });
+
 });
