@@ -4,9 +4,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const userInput = document.getElementById('user-input');
   const sendButton = document.getElementById('send-btn');
   const testingAssit = document.getElementById('test-asst');
-  const csvFileInput = document.getElementById('csv-file');
-  const csvBlock = document.getElementsByClassName('csv-upload')[0];
-  csvBlock.style.display = 'none';
+  const xmlFileInput = document.getElementById('xml-file');
+  const xmlBlock = document.getElementsByClassName('xml-upload')[0];
+  xmlBlock.style.display = 'none';
   const uploadButton = document.getElementById('upload-btn');
   let testAssistance = false;
 
@@ -84,9 +84,9 @@ document.addEventListener('DOMContentLoaded', () => {
     testAssistance = !testAssistance;
     testingAssit.style.backgroundColor = testAssistance ? 'blue' : 'grey';
     if (testAssistance)
-      csvBlock.style.display = 'flex';
+      xmlBlock.style.display = 'flex';
     else
-      csvBlock.style.display = 'none';
+      xmlBlock.style.display = 'none';
   }
 
   // Event listeners
@@ -105,12 +105,12 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   uploadButton.addEventListener('click', () => {
-    const file = csvFileInput.files[0];
+    const file = xmlFileInput.files[0];
     if (file) {
       const reader = new FileReader();
   
       reader.onload = async (event) => {
-        const csvData = event.target.result;
+        const xmlData = event.target.result;
   
         try {
           const response = await fetch("/file", {
@@ -118,13 +118,13 @@ document.addEventListener('DOMContentLoaded', () => {
             headers: {
               "Content-Type": "application/json",
             },
-            body: JSON.stringify({ file: csvData }),
+            body: JSON.stringify({ file: xmlData }),
           });
   
           const data = await response.json();
           console.log(data.response);
           if (data.response.includes("success")) {
-            alert(`CSV file uploaded successfully`, false);
+            alert(`XML file uploaded successfully`, false);
 
           }
           else{
@@ -132,13 +132,13 @@ document.addEventListener('DOMContentLoaded', () => {
           }
         } catch (error) {
           console.error("Error:", error);
-          alert("Sorry, please review your csv file, There was an error processing your CSV file.", false);
+          alert("Sorry, please review your XML file, There was an error processing your file.", false);
         }
       };
   
       reader.readAsText(file);
     } else {
-      alert('Please select a CSV file to upload.', false);
+      alert('Please select a XML file to upload.', false);
     }
   });
 

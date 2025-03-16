@@ -119,7 +119,7 @@ body {
 
 /* styles.css */
 /* Add this to your existing CSS */
-.csv-upload {
+.xml-upload {
   padding: 10px;
   background-color: #f9f9f9;
   border-top: 1px solid #ddd;
@@ -127,14 +127,14 @@ body {
   gap: 10px;
 }
 
-.csv-upload input[type="file"] {
+.xml-upload input[type="file"] {
   flex: 1;
   padding: 5px;
   border: 1px solid #ddd;
   border-radius: 5px;
 }
 
-.csv-upload button {
+.xml-upload button {
   padding: 5px 10px;
   background-color: #28a745;
   color: #fff;
@@ -143,6 +143,6 @@ body {
   cursor: pointer;
 }
 
-.csv-upload button:hover {
+.xml-upload button:hover {
   background-color: #218838;
 }
