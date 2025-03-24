@@ -5,6 +5,7 @@ import io
 import random
 import string
 from Gemini import Geminibot
+from Ollama import OllamaBot
 from Helper import *
 from Helper import test_cases, faiss_index
 
