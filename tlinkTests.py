@@ -11,8 +11,9 @@ from testlink import TestlinkAPIClient, TestLinkHelper, TestlinkAPIGeneric
 # tlinkClient = tl_helper.connect(TestlinkAPIClient)
 
 testlink_url = os.environ.get("TLINK_URL")
-devkey = os.environ.get("TLINK__API_KEY")
+devkey = os.environ.get("TLINK_API_KEY")
 
+print(testlink_url, devkey)
 
         
 # Create TestLink helper and API client
@@ -74,20 +75,23 @@ def create_testcase(testScenario: str, testCaseName: str, testSuiteID: str, test
     print(f"Test Case Name: {testCaseName}, Suite ID: {testSuiteID}, Project ID: {testProjectID}")
     i=0
     for testcase in testcases:
+        print(f"Test Cases no. {i}.")
+        
         testCaseName = testcase["test_case_title"]
         precondition = testcase["preconditions"]
         steps = testcase["steps"]
         expected_results = testcase["expected_results"]
         authorLogin="kirubakaran"
         tlinkClient.initStep(steps[0], expected_results[0], "manual")
-        for i in range(1, len(steps)):
-            tlinkClient.appendStep(steps[i], expected_results[i], "manual")
+        for j in range(1, len(steps)):
+            tlinkClient.appendStep(steps[j], expected_results[j], "manual")
 
         # Here you would typically integrate with the TestLink API
         if i<2:
-            tlinkClient.createTestCase(testCaseName, testSuiteID, testProjectID, authorLogin, testCaseName, preconditions=precondition, importance=2, executionType=1, estimatedExecDuration=0)
+            tc_create = tlinkClient.createTestCase(testCaseName, testSuiteID, testProjectID, authorLogin, testCaseName, preconditions=precondition, importance=2, executionType=1, estimatedExecDuration=0)
+            print(f"Test Case {i} created successfully.")
         i+=1
-        print(f"Test Case {i} created successfully.")
+
 def generate_testcase(Scenario):
     response = client.models.generate_content(
     model="gemini-2.0-flash",

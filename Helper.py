@@ -4,6 +4,7 @@ from sentence_transformers import SentenceTransformer
 import pandas as pd
 import faiss
 import numpy as np
+from Tlink import Tlink
 
 def xml_to_csv(xml_file, csv_file):
     # Parse the XML file
@@ -85,7 +86,7 @@ def xml_to_csv(xml_file, csv_file):
 
     print(f"CSV file '{csv_file}' has been created successfully.")
 
-
+tlink = Tlink()
 # Load Embedding Model
 embedding_model = SentenceTransformer("all-MiniLM-L6-v2")
 faiss_index =""
@@ -139,3 +140,28 @@ def set_up_knowledge_base():
     except:
         return False
     return True
+
+def handle_function_call(response):
+    if response.candidates and response.candidates[0].content.parts[0].function_call:
+        print("Function Call Triggered...")
+        function_call = response.candidates[0].content.parts[0].function_call
+        function_name = function_call.name
+        print(function_call.args)
+        arguments = function_call.args  # Parse JSON arguments
+
+        if function_name == "create_testcase":
+            tlink.create_testcase(
+                testScenario=arguments["testScenario"],
+                testCaseName=arguments["testCaseName"],
+                testSuiteID=arguments["testSuiteID"],
+                testProjectID=arguments["testProjectID"],
+            )
+            return "Created Testcases"
+
+        else:
+            print(f"Function {function_name} not implemented.")
+            return "Failed Creatin testcase"
+            
+            
+    else:
+        return None
