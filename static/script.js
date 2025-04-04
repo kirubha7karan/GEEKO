@@ -143,10 +143,4 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  clearSessionButton.addEventListener('click', () => {
-    sessionStorage.clear();
-    localStorage.clear();
-    messageContainer.innerHTML = ''; // Clear chat messages
-    alert('Session cleared successfully.');
-  });
 });

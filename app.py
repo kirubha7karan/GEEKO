@@ -34,9 +34,15 @@ def Chat():
             return jsonify({"response": "Max Input Character is 200"}), 400
         
         test_assist = request.json["testAssistance"]
-        user = session["user"] 
-        #Handling role change in user request
-        role = handle_role_change(role, test_assist,user = users[user])
+        
+        try:
+            user = session["user"] 
+        
+            #Handling role change in user request
+            role = handle_role_change(role, test_assist,user = users[user])
+        except:
+            session.clear()
+            return jsonify({"response" : "Session expired. Please refresh the page."}), 200
             
         if user_input:
             if test_assist:                 
