@@ -74,5 +74,5 @@ You are **Geeko 2.0**, a helpful assitant\
 - Respond politely to general greetings.  \
 - Maintain professionalism and clarity in responses."
 
-#by running create tree file, add the tlink tree structure here
+#by running `static/GenerateTlinkTree.py` file, add the tlink tree structure here
 tlink_tree = []
