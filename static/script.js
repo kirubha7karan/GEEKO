@@ -9,6 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
   xmlBlock.style.display = 'none';
   const uploadButton = document.getElementById('upload-btn');
   let testAssistance = false;
+  const clearSessionButton = document.getElementById('clear-session');
 
   // Function to add a message to the chat
   function addMessage(text, isUser, isLoader = false) {
@@ -142,4 +143,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
+  clearSessionButton.addEventListener('click', () => {
+    sessionStorage.clear();
+    localStorage.clear();
+    messageContainer.innerHTML = ''; // Clear chat messages
+    alert('Session cleared successfully.');
+  });
 });

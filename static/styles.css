@@ -67,6 +67,9 @@ body {
 .message.bot p {
   background-color: #f1f1f1;
   color: #333;
+  overflow-x: auto;
+  scrollbar-width: none; /* Hide scrollbar for Firefox */
+  -ms-overflow-style: none; /* Hide scrollbar for IE/Edge */
 }
 
 /* Loader inside bot's message */

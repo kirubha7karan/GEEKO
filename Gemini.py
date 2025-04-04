@@ -12,15 +12,22 @@ class GeminiBot:
             self.create_new_chat(role)
 
     def create_new_chat(self, role):
-        config = types.GenerateContentConfig(system_instruction=role, tools=FUNCTIONS, max_output_tokens=600)# if role == "test_assitant" else types.GenerateContentConfig(system_instruction=role, max_output_tokens=200)
-        
-        print(config.tools)
+        '''
+        Create a new chat session with the specified role.
+        '''
+        #tool call will be enabled only when not in Rag mode
+        config = types.GenerateContentConfig(system_instruction=role, tools=FUNCTIONS) if not "test cases" in role else types.GenerateContentConfig(system_instruction=role)
         self.chat = self.client.chats.create(
             model="gemini-2.0-flash", 
             config= config
             )
     
     def generate_testcase(self, Scenario):
+        '''
+        Generate test cases based on the provided scenario.
+        '''
+        
+        #Agent for generating test cases
         response = self.client.models.generate_content(
         model="gemini-2.0-flash",
         config=types.GenerateContentConfig(system_instruction=TESTCASE_INSTRUCTIONS),
@@ -29,7 +36,6 @@ class GeminiBot:
         op = re.sub("```json","",response.text)
         op = re.sub("```","",op)
 
-        print(op)
-
-    
-        return json.loads(op)
+        #followp up question to user for acknowledgement
+        response = "**REPHRASE THE TESTCASES IN JSON FORMAT AND ASK ME TO REVIEW THEM** \n"+str(op)+" Do not blindly ask me whether to create them without sending it in you response"
+        return response

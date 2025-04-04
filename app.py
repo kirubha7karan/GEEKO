@@ -7,7 +7,6 @@ import string
 from Gemini import GeminiBot
 from Ollama import OllamaBot
 from Helper import *
-from Helper import test_cases, faiss_index
 from constants import *
 
 global role, chat, test_assitant, bot
@@ -36,34 +35,45 @@ def Chat():
         
         test_assist = request.json["testAssistance"]
         user = session["user"] 
-        if test_assist and role != "test_assitant":
-            role = "test_assitant"
-            users[user].create_new_chat(TEST_ASSISTANT)
-        elif not test_assist and role != "bot":
-            role = "bot"
-            users[user].create_new_chat(BOT)
+        #Handling role change in user request
+        role = handle_role_change(role, test_assist,user = users[user])
             
         if user_input:
-            if request.json["testAssistance"]:                 
+            if test_assist:                 
                 
                 query_embedding = embedding_model.encode([user_input])
                 
                 try:
                     faiss_index, test_cases = get_data()
+                    
                     D, I = faiss_index.search(np.array(query_embedding), k=5)
                     results = test_cases.iloc[I[0]][["externalid", "summary", "preconditions", "combined_text"]].to_dict(orient="records")
                     user_txt = json.dumps({"query": user_input, "results": results})
-                    response = users[user].chat.send_message(user_txt)
-                    handle_function_call(response)
+
+                    response = users[user].chat.send_message(user_txt)               
                     response_text = response.text
+                    
                 except:
                     response_text = "Please add a Valid XML file and continue"
                 
             else:
                 response = users[user].chat.send_message(user_input)
-                text = handle_function_call(response)
+                #followup_question makes LLM to ask follow up questions to users in required parts of a function call
+                text, followup_question = handle_function_call(response)
+                    
+                if followup_question:
+                    
+                    try:
+                        response = users[user].chat.send_message(followup_question)                    
+                        return jsonify({"response": response.text})
+                    
+                    except Exception as e:
+                        print(e)
+                        print(response)
+                
                 if text:
-                    response = text
+                    return jsonify({"response": text})
+                
                 response_text = response.text
                 
         else:
