@@ -76,3 +76,35 @@ You are **Geeko 2.0**, a helpful assitant\
 
 #by running `static/GenerateTlinkTree.py` file, add the tlink tree structure here
 tlink_tree = []
+
+# FUNCTIONS = [
+#     {
+#         "function_declarations": [
+#             {
+#                 "name": "create_testcase",
+#                 "description": "Creates testcase in testlink using testlink API",
+#                 "parameters": {
+#                     "type": "object",
+#                     "properties": {
+#                         "testScenario": {"type": "string", "description": "Scenario for which test case is created"},
+#                         "testSuiteID": {"type": "string", "description": "Ask whether user know testsuite ID or not. If user doesn't know testsuite ID, perform `get_testsuite_id` tool call and ask user to choose from list of options provided from that tool call's results"},
+#                         "generatedTestcases": {"type": "string", "description": "List of generated test cases. **never ask user for generated testcases unless user himself tells you to ask for**"},
+#                         "acknowledgement": {"type":"boolean", "description": "user acceptance of generated test cases."}
+#                     },
+#                     "required": ["testScenario", "testSuiteID"],
+#                 },
+#             },
+#             {
+#               "name": "get_testsuite_id",
+#               "description": "Tool call for getting list of test suite IDs matching the given scenario. User cant trigger this tool call directly, can be triggered only by create_testcase tool call. This tool call will return the testsuite id with path of testsuite in testlink",
+#                 "parameters": {
+#                     "type": "object",
+#                     "properties": {
+#                       "Scenario": {"type": "string", "description" : "Scenario of the testcase (get it from input of create_testcase tool call)"}
+#                     },
+#                     "required": ["Scenario"],
+#                 }
+#             }
+#         ]
+#     }
+# ]
