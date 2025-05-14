@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,10 +8,11 @@
   <link rel="stylesheet" href="../static/styles.css">
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </head>
+
 <body>
   <div class="chatbot-container">
     <div class="chatbot-header">
-      <h2>Geeko</h2>
+      <h2>( ◣_◢ ) ALFRED </h2>
     </div>
     <div class="chatbot-messages" id="chatbot-messages">
       <!-- Chat messages will appear here -->
@@ -20,12 +22,26 @@
       <button id="send-btn">Send</button>
       <button id="test-asst" class="test-asst">Rag Mode</button>
     </div>
-    <div class="xml-upload">
-      <input type="file" id="xml-file" accept=".xml">
-      <button id="upload-btn">Upload XML</button>
+  </div>
+
+  <div class="menu">
+    <button id="upload-btn">Update KB</button>
+  </div>
+  
+  <!-- Add popup modal -->
+  <div id="uploadModal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h2>Upload XML File</h2>
+      <div class="upload-area">
+        <input type="file" id="xml-file" accept=".xml">
+        <button id="submit-upload">Upload</button>
+      </div>
     </div>
   </div>
 
   <script src="../static/script.js"></script>
+
 </body>
+
 </html>

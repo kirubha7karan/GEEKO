@@ -7,6 +7,7 @@ import numpy as np
 from Tlink import Tlink
 from constants import *
 from Gemini import GeminiBot
+from google.genai.types import FunctionResponse
 import json
 
 def xml_to_csv(xml_file, csv_file):
@@ -147,11 +148,13 @@ def set_up_knowledge_base():
         return False
     return True
 
+# def get_test_suites(testScenario):
 def get_test_suites(arguments):
     '''
     performs a semantic search on the tlink tree and returns the test suites
     '''
     query_embedding = embedding_model.encode([arguments["testScenario"]])
+    # query_embedding = embedding_model.encode([testScenario])
     D, I = tree.search(np.array(query_embedding), k=5)
     testSuites = df.iloc[I[0]].to_dict(orient="records")
 
@@ -175,6 +178,13 @@ def handle_function_call(response):
         function_name = function_call.name
         print("FUNCTION NAME: "+function_name)
         arguments = function_call.args  # Parse JSON arguments
+
+        # if function_name == "get_testsuite_id":
+        #     print(response)
+        #     res = get_test_suites(arguments["testScenario"])
+            
+        #     return "", 
+        #     pass
         
         if function_name == "create_testcase":
             
