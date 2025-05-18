@@ -1,6 +1,5 @@
 import weaviate
 from Helper import load_test_cases
-import pandas as pd
 from weaviate.util import generate_uuid5
 
 class Weaviate:
@@ -31,7 +30,6 @@ class Weaviate:
         for index, row in df.iterrows():
             arow = row.to_dict()
             obj_uuid = generate_uuid5(arow["externalid"])
-            print(obj_uuid)
             try:
                 collection.data.insert(
                     properties={
@@ -49,35 +47,15 @@ class Weaviate:
         print("Batch import completed successfully.")
         return str(Pass), str(Fail)
         
-    def get_nearest_match(self, collection_name, query):
+    def get_nearest_match(self, collection_name, query, limit=5):
         collection = self.client.collections.get(collection_name)
-        search_result = collection.query.near_text(query=query, limit=5)
+        search_result = collection.query.near_text(query=query, limit=limit)
+        # search_result = collection.query.hybrid(query=query, limit=limit)
         response = []
         for obj in search_result.objects:
             response.append(obj.properties)
         return response
 
-
-    '''set_up_knowledge_base()
-    query_embedding = embedding_model.encode(["when api nodes are empty"])
-    faiss_index, test_cases = get_data()
-    print("OLD Approach")
-    D, I = faiss_index.search(np.array(query_embedding), k=2)
-    results = test_cases.iloc[I[0]][["externalid", "summary"]].to_dict(orient="records")
-    for tc in results:
-        print(str(tc["externalid"]) +" : "+tc["summary"])'''
-
-        
-    '''print("\n\n\n\nNEW Approach:")
-
-    # load_knowledge_base("newTlink")
-    search_result=get_nearest_match("newTlink", "when api nodes are empty")
-    for tc in search_result:
-        tc =    
-        print(str(tc["testcase_ID"]) +" : "+tc["summary"])'''
-
-    # client.collections.create("Tlink")
-    # print(client.collections.list_all())
     def close_client(self):
         self.client.close()  # Free up resources
     

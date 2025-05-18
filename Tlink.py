@@ -1,5 +1,4 @@
 import os
-from Gemini import GeminiBot
 from testlink import TestlinkAPIClient, TestLinkHelper, TestlinkAPIGeneric
 
 class Tlink:

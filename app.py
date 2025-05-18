@@ -1,14 +1,10 @@
 from flask import Flask, jsonify, render_template, request, session
-import numpy as np
 import json
 import io
 import random
 import string
 from Gemini import *
-from Ollama import OllamaBot
-from Helper import *
-from constants import *
-from Weaviate import *
+# from Ollama import OllamaBot #Uncomment if using Local LLM 
 
 global role, chat, test_assitant, bot
 role = "bot"
@@ -42,14 +38,21 @@ def Chat():
         
             #Handling role change in user request
             role = handle_role_change(role, test_assist,user = users[user])
-        except:
+        except Exception as e:
             session.clear()
-            return jsonify({"response" : "Session expired. Please refresh the page."}), 200
+            '''
+            Creating new seesion in case old is expired
+            '''
+            print("session Expired")
+            user = ''.join(random.choices(string.ascii_letters,k=10))
+            session["user"] = user
+            users[user] =  GeminiBot(role)
+            user = session["user"] 
             
         if user_input:
             if test_assist:                 
                 
-                query_embedding = embedding_model.encode([user_input])
+                # query_embedding = embedding_model.encode([user_input])
                 
                 try:
                     # faiss_index, test_cases = get_data()
@@ -57,7 +60,7 @@ def Chat():
                     # results = test_cases.iloc[I[0]][["externalid", "summary", "preconditions", "combined_text"]].to_dict(orient="records")
                     # print("Faiss Search Results: ", results)
                     
-                    results = vector_DB.get_nearest_match("tlink",user_input)
+                    results = vector_DB.get_nearest_match("testing",user_input)
                     print("Weaviate Search Results: ", results)
                     
                     user_txt = json.dumps({"query": user_input, "results": results})
@@ -65,26 +68,19 @@ def Chat():
                     response = users[user].chat.send_message(user_txt)               
                     response_text = response.text
                     
-                except:
+                except Exception as e:
+                    print(e)
+                    
                     response_text = "Please add a Valid XML file and continue"
                 
             else:
                 response = users[user].chat.send_message(user_input)
                 #followup_question makes LLM to ask follow up questions to users in required parts of a function call
-                text, followup_question = handle_function_call(response)
+                if response.candidates and response.candidates[0].content.parts[0].function_call:
+                    text = users[user].handle_function_call(response)
                     
-                if followup_question:
-                    
-                    try:
-                        response = users[user].chat.send_message(followup_question)                    
-                        return jsonify({"response": response.text})
-                    
-                    except Exception as e:
-                        print(e)
-                        print(response)
-                
-                if text:
-                    return jsonify({"response": text})
+                    if text:
+                        return jsonify({"response": text})
                 
                 response_text = response.text
                 
@@ -103,7 +99,7 @@ def handle_file_upload():
         try:
             xml_to_csv(xml_content, "./static/knowledge_base.csv")
             # var = set_up_knowledge_base()
-            Pass, fail = vector_DB.load_knowledge_base("Tlink")
+            Pass, fail = vector_DB.load_knowledge_base("testing")
             
             return jsonify({"response": "Testcases Uploaded - "+Pass+" Failed Testcases Upload - "+fail})
         except:

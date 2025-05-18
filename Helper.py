@@ -1,14 +1,11 @@
 import csv
 import xml.etree.ElementTree as ET
-from sentence_transformers import SentenceTransformer
+# from sentence_transformers import SentenceTransformer
 import pandas as pd
-import faiss
+# import faiss
 import numpy as np
 from Tlink import Tlink
 from constants import *
-from Gemini import GeminiBot
-from google.genai.types import FunctionResponse
-import json
 
 def xml_to_csv(xml_file, csv_file):
     '''
@@ -95,7 +92,7 @@ def xml_to_csv(xml_file, csv_file):
 
 tlink = Tlink()
 # Load Embedding Model
-embedding_model = SentenceTransformer("all-MiniLM-L6-v2")
+# embedding_model = SentenceTransformer("all-MiniLM-L6-v2")
 faiss_index =""
 test_cases = ""
 
@@ -149,85 +146,28 @@ def set_up_knowledge_base():
     return True
 
 # def get_test_suites(testScenario):
-def get_test_suites(arguments):
+def get_test_suites(testScenario, vector_DB):
     '''
     performs a semantic search on the tlink tree and returns the test suites
     '''
-    query_embedding = embedding_model.encode([arguments["testScenario"]])
+    # query_embedding = embedding_model.encode([arguments["testScenario"]])
     # query_embedding = embedding_model.encode([testScenario])
-    D, I = tree.search(np.array(query_embedding), k=5)
-    testSuites = df.iloc[I[0]].to_dict(orient="records")
-
-    prompt = "\n"
-    for i in testSuites:
-        prompt+=i[0]+"\n"
+    # D, I = tree.search(np.array(query_embedding), k=5)
+    # testSuites = df.iloc[I[0]].to_dict(orient="records")
+    
+    testSuites = vector_DB.get_nearest_match("Rently_Testsuites", testScenario, 10)
+        
+    ress = {}
+    j=1
+    for i in testSuites:        
+        ress[str(j)] = i["testSuite_name"]
+        j+=1
     
     # A followup question to user to select the test suite id
-    followup_question = "ask me where to create the test case?\n"+prompt+"\nask me to select the test suite id"
-    return followup_question
+    # followup_question = "ask me where to create the test case?\n"+prompt+"\nask me to select the test suite id"
+    
+    return ress
 
-def handle_function_call(response):
-    '''
-    Handles the function call from the response.
-    and trigger appropriate function
-    '''
-    if response.candidates and response.candidates[0].content.parts[0].function_call:
-        
-        print("Function Call Triggered...")
-        function_call = response.candidates[0].content.parts[0].function_call
-        function_name = function_call.name
-        print("FUNCTION NAME: "+function_name)
-        arguments = function_call.args  # Parse JSON arguments
-
-        # if function_name == "get_testsuite_id":
-        #     print(response)
-        #     res = get_test_suites(arguments["testScenario"])
-            
-        #     return "", 
-        #     pass
-        
-        if function_name == "create_testcase":
-            
-            try:
-                print(arguments["testSuiteID"])
-            except:
-                followup_question = get_test_suites(arguments)
-                return None, followup_question
-                
-            
-            try:
-                print(arguments["generatedTestcases"])
-            except:
-                gemini = GeminiBot("test_case_generator")
-                #Semantic search on the test cases to get impacted modules
-                query_embedding = embedding_model.encode([arguments["testScenario"]])
-                D, I = faiss_index.search(np.array(query_embedding), k=5)
-                impactedTestcases = test_cases.iloc[I[0]][["externalid", "summary", "preconditions", "combined_text"]].to_dict(orient="records")
-                
-                testScenario = {"scenario": arguments["testScenario"], "related testcases":impactedTestcases}
-                
-                print("Impacted testcases: ", impactedTestcases)
-                followup_question = gemini.generate_testcase(json.dumps(testScenario))
-                return None, followup_question
-                
-            try:
-                print(arguments["acknowledgement"])
-            except:
-                return None, "Do you acknowledge generated testcases ?"
-            
-            print("creating testcases")
-            tlink.create_testcase(
-                    testScenario=arguments["testScenario"],
-                    testSuiteID=arguments["testSuiteID"],
-                    Testcases = json.loads(arguments["generatedTestcases"]),
-                )
-            return "Created Testcases", None
-        else:
-            print(f"Function {function_name} not implemented.")
-            return "Failed Creatin testcase", None
-                
-    else:
-        return None, None
     
 def handle_role_change(curr_role, role, user):
     '''
@@ -244,6 +184,6 @@ def handle_role_change(curr_role, role, user):
     return curr_role
 
 # Embed the tlink tree       
-df = pd.DataFrame(tlink_tree)
-tlink_embeddings = embed_texts(tlink_tree)
-tree = create_faiss_index(tlink_embeddings)
+# df = pd.DataFrame(tlink_tree)
+# tlink_embeddings = embed_texts(tlink_tree)
+# tree = create_faiss_index(tlink_embeddings)
