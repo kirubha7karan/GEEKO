@@ -5,10 +5,15 @@ document.addEventListener('DOMContentLoaded', () => {
   const sendButton = document.getElementById('send-btn');
   const testingAssit = document.getElementById('test-asst');
   const xmlFileInput = document.getElementById('xml-file');
-  const xmlBlock = document.getElementsByClassName('xml-upload')[0];
-  xmlBlock.style.display = 'none';
+  // const xmlBlock = document.getElementsByClassName('xml-upload')[0];
+  // xmlBlock.style.display = 'none';
   const uploadButton = document.getElementById('upload-btn');
   let testAssistance = false;
+  const clearSessionButton = document.getElementById('clear-session');
+
+  const modal = document.getElementById('uploadModal');
+  const closeBtn = document.getElementsByClassName('close')[0];
+  const submitUploadBtn = document.getElementById('submit-upload');
 
   // Function to add a message to the chat
   function addMessage(text, isUser, isLoader = false) {
@@ -82,7 +87,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   async function enableTestAssistance() {
     testAssistance = !testAssistance;
-    testingAssit.style.backgroundColor = testAssistance ? 'blue' : 'grey';
+    testingAssit.style.backgroundColor = testAssistance ? 'black' : 'grey';
     if (testAssistance)
       xmlBlock.style.display = 'flex';
     else
@@ -98,13 +103,28 @@ document.addEventListener('DOMContentLoaded', () => {
   });
   testingAssit.addEventListener('click', enableTestAssistance);
   testingAssit.onmouseover = () => {
-    testingAssit.style.backgroundColor = testAssistance ? '#0056b3' : 'darkgrey';
+    testingAssit.style.backgroundColor = testAssistance ? '#393d41' : 'darkgrey';
   };
   testingAssit.onmouseout = () => {
-    testingAssit.style.backgroundColor = testAssistance ? '#007bff' : 'grey';
+    testingAssit.style.backgroundColor = testAssistance ? '#17191b' : 'grey';
   };
 
   uploadButton.addEventListener('click', () => {
+    modal.style.display = 'block';
+    console.log("Upload button clicked");
+  });
+
+  closeBtn.addEventListener('click', () => {
+    modal.style.display = 'none';
+  });
+
+  window.addEventListener('click', (event) => {
+    if (event.target === modal) {
+      modal.style.display = 'none';
+    }
+  });
+
+  submitUploadBtn.addEventListener('click', () => {
     const file = xmlFileInput.files[0];
     if (file) {
       const reader = new FileReader();
@@ -124,21 +144,21 @@ document.addEventListener('DOMContentLoaded', () => {
           const data = await response.json();
           console.log(data.response);
           if (data.response.includes("success")) {
-            alert(`XML file uploaded successfully`, false);
-
-          }
-          else{
-            alert(data.response, false);
+            alert(`XML file uploaded successfully`);
+            modal.style.display = 'none';
+          } else {
+            alert(data.response);
           }
         } catch (error) {
           console.error("Error:", error);
-          alert("Sorry, please review your XML file, There was an error processing your file.", false);
+          alert("Sorry, please review your XML file, There was an error processing your file.");
         }
+        modal.style.display = 'none';
       };
   
       reader.readAsText(file);
     } else {
-      alert('Please select a XML file to upload.', false);
+      alert('Please select a XML file to upload.');
     }
   });
 

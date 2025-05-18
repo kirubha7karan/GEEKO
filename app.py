@@ -1,43 +1,19 @@
 from flask import Flask, jsonify, render_template, request, session
-import numpy as np
 import json
 import io
 import random
 import string
-from Gemini import Geminibot
-from Ollama import OllamaBot
-from Helper import *
-from Helper import test_cases, faiss_index
+from Gemini import *
+# from Ollama import OllamaBot #Uncomment if using Local LLM 
 
 global role, chat, test_assitant, bot
 role = "bot"
 users = {}
 
-test_assitant = "# Geeko 2.0 - System Instruction\
-You are **Geeko 2.0**, a helpful testing assistant responsible for test cases of the *uploaded* application.\
-## Behavior Guidelines\
-- Respond politely to general greetings.  \
-- Maintain professionalism and clarity in responses.  \
-\
-## Response Rules\
-1. **If a user asks what you can do**, reply:  \
-   *\"I can help you with understanding testcases you have upload.\"*  \
-2. **When given a query**, review the provided *TestLink* test cases (`results`) and respond based on the most relevant ones.  \
-3. **Do not mention test case IDs** unless explicitly requested by the user.  \
-4. **If the user provides a specific test case ID** and asks for an explanation, explain *only that test case*."
-
-bot = "# Geeko 2.0 - System Instruction\
-You are **Geeko 2.0**, a helpful assitant\
-## Behavior Guidelines\
-- Respond politely to general greetings.  \
-- Maintain professionalism and clarity in responses."
-
-
-
 app = Flask(__name__)
 app.secret_key = 'geekoStar'
-
-
+vector_DB = Weaviate()
+ 
 @app.route('/',methods=["GET","POST"])
 def Chat():
     global role, test_assitant, bot
@@ -45,41 +21,67 @@ def Chat():
         if not session:
             user = ''.join(random.choices(string.ascii_letters,k=10))
             session["user"] = user
-            users[user] =  Geminibot(role)
+            users[user] =  GeminiBot(role)
         return render_template('chatbot.html', response="")
     
     else:
         response_text =""
         user_input = request.json["message"]
+        
         if len(user_input) >200:
             return jsonify({"response": "Max Input Character is 200"}), 400
         
         test_assist = request.json["testAssistance"]
-        user = session["user"] 
-        if test_assist and role != "test_assitant":
-            role = "test_assitant"
-            users[user].create_new_chat(test_assitant)
-        elif not test_assist and role != "bot":
-            role = "bot"
-            users[user].create_new_chat(bot)
+        
+        try:
+            user = session["user"] 
+        
+            #Handling role change in user request
+            role = handle_role_change(role, test_assist,user = users[user])
+        except Exception as e:
+            session.clear()
+            '''
+            Creating new seesion in case old is expired
+            '''
+            print("session Expired")
+            user = ''.join(random.choices(string.ascii_letters,k=10))
+            session["user"] = user
+            users[user] =  GeminiBot(role)
+            user = session["user"] 
             
         if user_input:
-            if request.json["testAssistance"]:                 
+            if test_assist:                 
                 
-                query_embedding = embedding_model.encode([user_input])
+                # query_embedding = embedding_model.encode([user_input])
                 
                 try:
-                    faiss_index, test_cases = get_data()
-                    D, I = faiss_index.search(np.array(query_embedding), k=5)
-                    results = test_cases.iloc[I[0]][["externalid", "summary", "preconditions", "combined_text"]].to_dict(orient="records")
+                    # faiss_index, test_cases = get_data()
+                    # D, I = faiss_index.search(np.array(query_embedding), k=5)
+                    # results = test_cases.iloc[I[0]][["externalid", "summary", "preconditions", "combined_text"]].to_dict(orient="records")
+                    # print("Faiss Search Results: ", results)
+                    
+                    results = vector_DB.get_nearest_match("testing",user_input)
+                    print("Weaviate Search Results: ", results)
+                    
                     user_txt = json.dumps({"query": user_input, "results": results})
-                    response = users[user].chat.send_message(user_txt)
+
+                    response = users[user].chat.send_message(user_txt)               
                     response_text = response.text
-                except:
+                    
+                except Exception as e:
+                    print(e)
+                    
                     response_text = "Please add a Valid XML file and continue"
                 
             else:
                 response = users[user].chat.send_message(user_input)
+                #followup_question makes LLM to ask follow up questions to users in required parts of a function call
+                if response.candidates and response.candidates[0].content.parts[0].function_call:
+                    text = users[user].handle_function_call(response)
+                    
+                    if text:
+                        return jsonify({"response": text})
+                
                 response_text = response.text
                 
         else:
@@ -96,12 +98,10 @@ def handle_file_upload():
         xml_content = io.StringIO(data['file'])
         try:
             xml_to_csv(xml_content, "./static/knowledge_base.csv")
-            var = set_up_knowledge_base()
+            # var = set_up_knowledge_base()
+            Pass, fail = vector_DB.load_knowledge_base("testing")
             
-            if var:
-                return jsonify({"response": "File uploaded successfully."})
-            else:
-                return jsonify({"response": "Mandatory fields are missing. Please import testlink exported XML file."}), 400
+            return jsonify({"response": "Testcases Uploaded - "+Pass+" Failed Testcases Upload - "+fail})
         except:
             return jsonify({"response": "Mandatory fields are missing. Please import testlink exported XML file."}), 400
 

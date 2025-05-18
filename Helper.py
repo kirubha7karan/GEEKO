@@ -1,11 +1,16 @@
 import csv
 import xml.etree.ElementTree as ET
-from sentence_transformers import SentenceTransformer
+# from sentence_transformers import SentenceTransformer
 import pandas as pd
-import faiss
+# import faiss
 import numpy as np
+from Tlink import Tlink
+from constants import *
 
 def xml_to_csv(xml_file, csv_file):
+    '''
+    Convert XML file to CSV format.
+    '''
     # Parse the XML file
     tree = ET.parse(xml_file)
     root = tree.getroot()
@@ -85,9 +90,9 @@ def xml_to_csv(xml_file, csv_file):
 
     print(f"CSV file '{csv_file}' has been created successfully.")
 
-
+tlink = Tlink()
 # Load Embedding Model
-embedding_model = SentenceTransformer("all-MiniLM-L6-v2")
+# embedding_model = SentenceTransformer("all-MiniLM-L6-v2")
 faiss_index =""
 test_cases = ""
 
@@ -127,7 +132,7 @@ def create_faiss_index(embeddings):
     index = faiss.IndexFlatL2(embeddings.shape[1])
     index.add(embeddings)
     return index
-    
+
 def set_up_knowledge_base():
     global faiss_index, test_cases
     # Load and Process Test Cases
@@ -139,3 +144,46 @@ def set_up_knowledge_base():
     except:
         return False
     return True
+
+# def get_test_suites(testScenario):
+def get_test_suites(testScenario, vector_DB):
+    '''
+    performs a semantic search on the tlink tree and returns the test suites
+    '''
+    # query_embedding = embedding_model.encode([arguments["testScenario"]])
+    # query_embedding = embedding_model.encode([testScenario])
+    # D, I = tree.search(np.array(query_embedding), k=5)
+    # testSuites = df.iloc[I[0]].to_dict(orient="records")
+    
+    testSuites = vector_DB.get_nearest_match("Rently_Testsuites", testScenario, 10)
+        
+    ress = {}
+    j=1
+    for i in testSuites:        
+        ress[str(j)] = i["testSuite_name"]
+        j+=1
+    
+    # A followup question to user to select the test suite id
+    # followup_question = "ask me where to create the test case?\n"+prompt+"\nask me to select the test suite id"
+    
+    return ress
+
+    
+def handle_role_change(curr_role, role, user):
+    '''
+    When ever user changes role of the bot,
+    Existing chat session is closed and new chat session is created
+    with the new role
+    '''
+    if role and curr_role != "test_assitant":
+        user.create_new_chat(TEST_ASSISTANT)
+        return "test_assitant"
+    elif not role and curr_role != "bot":
+        user.create_new_chat(BOT)
+        return "bot"
+    return curr_role
+
+# Embed the tlink tree       
+# df = pd.DataFrame(tlink_tree)
+# tlink_embeddings = embed_texts(tlink_tree)
+# tree = create_faiss_index(tlink_embeddings)
