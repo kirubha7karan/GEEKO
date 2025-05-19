@@ -1,4 +1,4 @@
-# FlaskBot
+# Geeko
 A simple Flask chatbot application powered by Gemini 2.0 Flash.
 
 ## Prerequisites for Running the App
