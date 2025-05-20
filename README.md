@@ -4,7 +4,7 @@ A simple Flask chatbot application powered by Gemini 2.0 Flash.
 ## Prerequisites for Running the App
 1. Get the Gemini API Key from the Google AI Studio.  
  - Link to refer - [Google AI Studio](https://ai.google.dev/gemini-api/docs/api-key)
-2. Set Required env variables - ref .env.sample file 
+2. Create a .env file and Set Required env variables - ref .env.sample file 
 3. Setup the Weaviate in Local
 
 ## Installation

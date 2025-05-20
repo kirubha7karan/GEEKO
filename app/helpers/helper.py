@@ -4,9 +4,12 @@ import xml.etree.ElementTree as ET
 import pandas as pd
 # import faiss
 import numpy as np
-from Tlink import Tlink
-from constants import *
+from app.services.tlink import Tlink
+from app.constants import *
+import os
+from dotenv import load_dotenv
 
+load_dotenv()
 def xml_to_csv(xml_file, csv_file):
     '''
     Convert XML file to CSV format.
@@ -137,7 +140,7 @@ def set_up_knowledge_base():
     global faiss_index, test_cases
     # Load and Process Test Cases
     try:
-        test_cases = load_test_cases("./static/knowledge_base.csv")
+        test_cases = load_test_cases("app/static/knowledge_base.csv")
         embeddings = embed_texts(test_cases["combined_text"].tolist())
         faiss_index = create_faiss_index(embeddings)
 
@@ -155,7 +158,7 @@ def get_test_suites(testScenario, vector_DB):
     # D, I = tree.search(np.array(query_embedding), k=5)
     # testSuites = df.iloc[I[0]].to_dict(orient="records")
     
-    testSuites = vector_DB.get_nearest_match("Rently_Testsuites", testScenario, 10)
+    testSuites = vector_DB.get_nearest_match(os.getenv("Weaviate_Tree_Name"), testScenario, 10)
         
     ress = {}
     j=1

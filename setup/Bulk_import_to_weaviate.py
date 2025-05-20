@@ -1,7 +1,7 @@
 import testlink
 import csv
 import os
-from Weaviate import Weaviate
+from app.services.Weaviate import Weaviate
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -10,7 +10,7 @@ TESTLINK_URL = os.getenv("TLINK_URL")
 execution_type_map = {"1": "Manual", "2": "Automated","3": "To Be Automated"}
 # Initialize TestLink API client
 tlc = testlink.TestlinkAPIClient(TESTLINK_URL, TESTLINK_API_KEY)
-PROJECT_ID = 258561
+PROJECT_ID = None
 
 def get_methods():
     for method in testlink.testlinkargs._apiMethodsArgs.keys():
@@ -57,10 +57,8 @@ def get_test_cases(suite_id,suite_name, csv_writer,include_sub_suites=True):
                 details="simple",
                 version=int(case['version'])
             )
-            value = decision(case['execution_type'], custom_fields['value'])
-            test_case_id = f'RM-{case.get("tc_external_id", "N/A")}'
-            test_case_url = f'https://tlink.rentlyqeop.com/linkto.php?tprojectPrefix=RM&item=testcase&id={test_case_id}'
-            # csv_writer.writerow([suite_name, case['id'], test_case_id, case['name'],value['Type'],value['Status'],value['Automation Test Case ID'],value['Comments'],test_case_url])
+            # value = decision(case['execution_type'], custom_fields['value'])
+            # test_case_id = f'RM-{case.get("tc_external_id", "N/A")}'            # csv_writer.writerow([suite_name, case['id'], test_case_id, case['name'],value['Type'],value['Status'],value['Automation Test Case ID'],value['Comments'],test_case_url])
             writelist = [case['tc_external_id'], case['summary'], case['preconditions']]
             
             for step in case["steps"]:
@@ -90,11 +88,13 @@ def get_suites(suite_id,suite_name, csv_writer):
 
 
 if __name__ == "__main__":
-    suite_id = 501191
-    # suite_id = 501194
+    suite_id = input("Enter Suite ID: ") #eg: 501194
     
-    suite_name = "Armor"
-    # suite_name = "Login Page"
+    suite_name = input("Enter Suite Name: ") # eg: Login Page
+    
+    Project = input("Enter Project ID:")
+    PROJECT_ID = Project
+    
     
     csv_filename = f'{suite_name}_data.csv'
     
@@ -130,5 +130,5 @@ if __name__ == "__main__":
     print(f"Data has been written to {csv_filename}")
 
 kb = Weaviate()
-kb.load_knowledge_base("testings", csv_filename)
+kb.load_knowledge_base(os.getenv("Weaviate_Collection_Name"), csv_filename)
 kb.close_client()

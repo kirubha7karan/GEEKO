@@ -4,6 +4,7 @@ Run this file and assign it to `tlink_tree` list constants.py file
 from testlink import TestlinkAPIClient
 import os
 from dotenv import load_dotenv
+from app.services.Weaviate import Weaviate
 
 load_dotenv()
 # Replace with your TestLink server details
@@ -13,6 +14,7 @@ API_KEY = os.getenv("TLINK_API_KEY")
 tl = TestlinkAPIClient(TESTLINK_URL, API_KEY)
 
 def get_test_suites(project_name):
+    testsuites = []
     project = next((p for p in tl.getProjects() if p['name'] == project_name), None)
     if not project:
         print(f"Project '{project_name}' not found.")
@@ -31,13 +33,23 @@ def get_test_suites(project_name):
                 for child in children.values():
                     build_hierarchy(child, full_path)
             else:
+                testsuites.append(f"{project_name} -> {full_path} -> {suite_id}")
                 print(f"{project_name} -> {full_path} -> {suite_id}")
         except:
+            testsuites.append(f"{project_name} -> {full_path} -> {suite_id}")
             print(f"{project_name} -> {full_path} -> {suite_id}")
             
 
     for suite in suites:
         build_hierarchy(suite)
+    
+    return testsuites
 
 # Replace 'Your_Project_Name' with your actual project name
-get_test_suites("Your_Project_Name")
+Project = input("Enter Project Name: ") #eg: Master
+
+testsuites = get_test_suites(Project)
+
+kb = Weaviate()
+kb.load_tlink_tree(os.getenv("Weaviate_Tree_Name"), testsuites)
+kb.close_client()

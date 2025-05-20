@@ -1,5 +1,5 @@
 import weaviate
-from Helper import load_test_cases
+from app.helpers.helper import load_test_cases
 from weaviate.util import generate_uuid5
 from datetime import datetime
 class Weaviate:
@@ -16,7 +16,7 @@ class Weaviate:
     def delete_collections(self, collection_name):
         self.client.collections.delete(name=collection_name)
         
-    def load_knowledge_base(self, collection_name, knowledge_base = "./static/knowledge_base.csv"):
+    def load_knowledge_base(self, collection_name, knowledge_base = "app/static/knowledge_base.csv"):
         collection = self.client.collections.get(collection_name)
         
         df = load_test_cases(knowledge_base)
@@ -48,6 +48,18 @@ class Weaviate:
         print("Batch import completed successfully.")
         return str(Pass), str(Fail)
         
+    def load_tlink_tree(self, collection_name, testsuites_hierarchy_list):
+        collection = self.client.collections.get(collection_name)
+        count = len(testsuites_hierarchy_list)
+        print("Total Testsuites count - ",count)
+        
+        for suite in testsuites_hierarchy_list:
+           collection.data.insert(
+                    properties={
+                    "testSuite_name": suite,   
+                })
+        print(f"{count} testsuites have been added")
+    
     def get_nearest_match(self, collection_name, query, limit=5):
         collection = self.client.collections.get(collection_name)
         search_result = collection.query.near_text(query=query, limit=limit)
