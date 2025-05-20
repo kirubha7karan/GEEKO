@@ -1,7 +1,7 @@
 import testlink
 import csv
 import os
-from Weaviate import Weaviate
+from app.services.Weaviate import Weaviate
 from dotenv import load_dotenv
 
 load_dotenv()

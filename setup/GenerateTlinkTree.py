@@ -4,7 +4,7 @@ Run this file and assign it to `tlink_tree` list constants.py file
 from testlink import TestlinkAPIClient
 import os
 from dotenv import load_dotenv
-from Weaviate import Weaviate
+from app.services.Weaviate import Weaviate
 
 load_dotenv()
 # Replace with your TestLink server details

@@ -1,5 +1,5 @@
 import weaviate
-from Helper import load_test_cases
+from app.helpers.helper import load_test_cases
 from weaviate.util import generate_uuid5
 from datetime import datetime
 class Weaviate:
@@ -16,7 +16,7 @@ class Weaviate:
     def delete_collections(self, collection_name):
         self.client.collections.delete(name=collection_name)
         
-    def load_knowledge_base(self, collection_name, knowledge_base = "./static/knowledge_base.csv"):
+    def load_knowledge_base(self, collection_name, knowledge_base = "app/static/knowledge_base.csv"):
         collection = self.client.collections.get(collection_name)
         
         df = load_test_cases(knowledge_base)

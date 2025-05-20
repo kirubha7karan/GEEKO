@@ -4,8 +4,8 @@ import xml.etree.ElementTree as ET
 import pandas as pd
 # import faiss
 import numpy as np
-from Tlink import Tlink
-from constants import *
+from app.services.tlink import Tlink
+from app.constants import *
 
 def xml_to_csv(xml_file, csv_file):
     '''
@@ -137,7 +137,7 @@ def set_up_knowledge_base():
     global faiss_index, test_cases
     # Load and Process Test Cases
     try:
-        test_cases = load_test_cases("./static/knowledge_base.csv")
+        test_cases = load_test_cases("app/static/knowledge_base.csv")
         embeddings = embed_texts(test_cases["combined_text"].tolist())
         faiss_index = create_faiss_index(embeddings)
 

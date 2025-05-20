@@ -3,9 +3,9 @@ from google.genai import types
 import os
 import re
 import json
-from constants import *
-from Helper import *
-from Weaviate import Weaviate
+from app.constants import *
+from app.helpers.helper import *
+from app.services.Weaviate import Weaviate
 from dotenv import load_dotenv
 
 load_dotenv()
