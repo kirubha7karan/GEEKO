@@ -1,14 +1,10 @@
 import weaviate
 from Helper import load_test_cases
 from weaviate.util import generate_uuid5
-
+from datetime import datetime
 class Weaviate:
     def __init__(self):
-        self.client = weaviate.connect_to_local(
-            host="localhost",
-            port=8081,
-            grpc_port=50051,
-        )
+        self.client = weaviate.connect_to_local(host="localhost", port=8081, grpc_port=50051,)
 
     def create_collection(self, collection_name):
         self.client.collections.create(name=collection_name)
@@ -20,10 +16,12 @@ class Weaviate:
     def delete_collections(self, collection_name):
         self.client.collections.delete(name=collection_name)
         
-    def load_knowledge_base(self, collection_name):
+    def load_knowledge_base(self, collection_name, knowledge_base = "./static/knowledge_base.csv"):
         collection = self.client.collections.get(collection_name)
         
-        df = load_test_cases("./static/knowledge_base.csv")
+        df = load_test_cases(knowledge_base)
+        start = datetime.now()
+        print("proceessed csv. started batch import")
         
         # with collection.batch.dynamic() as batch:
         Pass, Fail = 0,0
@@ -44,6 +42,9 @@ class Weaviate:
                 Fail+=1
                 print(e)
                 pass
+        end = datetime.now()
+        ttl = end-start
+        print("Took: ",ttl.seconds, "Seconds")
         print("Batch import completed successfully.")
         return str(Pass), str(Fail)
         

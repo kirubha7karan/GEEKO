@@ -6,6 +6,9 @@ import json
 from constants import *
 from Helper import *
 from Weaviate import Weaviate
+from dotenv import load_dotenv
+
+load_dotenv()
 class GeminiBot:
     def __init__(self, role):
         self.client = genai.Client(api_key=os.getenv("GEMINI_KEY"))

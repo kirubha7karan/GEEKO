@@ -3,7 +3,9 @@ Run this file and assign it to `tlink_tree` list constants.py file
 '''
 from testlink import TestlinkAPIClient
 import os
+from dotenv import load_dotenv
 
+load_dotenv()
 # Replace with your TestLink server details
 TESTLINK_URL = os.getenv("TLINK_URL")
 API_KEY = os.getenv("TLINK_API_KEY")

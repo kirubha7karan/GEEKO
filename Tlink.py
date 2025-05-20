@@ -1,6 +1,8 @@
 import os
 from testlink import TestlinkAPIClient, TestLinkHelper, TestlinkAPIGeneric
+from dotenv import load_dotenv
 
+load_dotenv()
 class Tlink:
     def __init__(self):
         testlink_url = os.getenv("TLINK_URL")
