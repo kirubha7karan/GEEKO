@@ -46,10 +46,10 @@ def get_test_suites(project_name):
     return testsuites
 
 # Replace 'Your_Project_Name' with your actual project name
-Project = input("Enter Project Name: ") #eg: Rently Master
+Project = input("Enter Project Name: ") #eg: Master
 
 testsuites = get_test_suites(Project)
 
 kb = Weaviate()
-kb.load_tlink_tree(os.getenv("Weaviate_Collection_Name")+"_tree", testsuites)
+kb.load_tlink_tree(os.getenv("Weaviate_Tree_Name"), testsuites)
 kb.close_client()

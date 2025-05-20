@@ -10,7 +10,7 @@ TESTLINK_URL = os.getenv("TLINK_URL")
 execution_type_map = {"1": "Manual", "2": "Automated","3": "To Be Automated"}
 # Initialize TestLink API client
 tlc = testlink.TestlinkAPIClient(TESTLINK_URL, TESTLINK_API_KEY)
-PROJECT_ID = 258561
+PROJECT_ID = None
 
 def get_methods():
     for method in testlink.testlinkargs._apiMethodsArgs.keys():
@@ -57,10 +57,8 @@ def get_test_cases(suite_id,suite_name, csv_writer,include_sub_suites=True):
                 details="simple",
                 version=int(case['version'])
             )
-            value = decision(case['execution_type'], custom_fields['value'])
-            test_case_id = f'RM-{case.get("tc_external_id", "N/A")}'
-            test_case_url = f'https://tlink.rentlyqeop.com/linkto.php?tprojectPrefix=RM&item=testcase&id={test_case_id}'
-            # csv_writer.writerow([suite_name, case['id'], test_case_id, case['name'],value['Type'],value['Status'],value['Automation Test Case ID'],value['Comments'],test_case_url])
+            # value = decision(case['execution_type'], custom_fields['value'])
+            # test_case_id = f'RM-{case.get("tc_external_id", "N/A")}'            # csv_writer.writerow([suite_name, case['id'], test_case_id, case['name'],value['Type'],value['Status'],value['Automation Test Case ID'],value['Comments'],test_case_url])
             writelist = [case['tc_external_id'], case['summary'], case['preconditions']]
             
             for step in case["steps"]:
@@ -94,23 +92,8 @@ if __name__ == "__main__":
     
     suite_name = input("Enter Suite Name: ") # eg: Login Page
     
-    Project = input("Enter SmartHome (1) / Rently (2):")
-    looop = True
-    
-    while looop:
-        try:
-            if Project == "1":
-                PROJECT_ID = 244473
-                looop = False
-                
-            elif Project == "2":
-                PROJECT_ID = 258561
-                looop = False
-                
-            else:
-                raise Exception
-        except:
-            Project = input("Enter SmartHome (1) / Rently (2):")
+    Project = input("Enter Project ID:")
+    PROJECT_ID = Project
     
     
     csv_filename = f'{suite_name}_data.csv'

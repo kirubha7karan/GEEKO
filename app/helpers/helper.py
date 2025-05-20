@@ -6,7 +6,10 @@ import pandas as pd
 import numpy as np
 from app.services.tlink import Tlink
 from app.constants import *
+import os
+from dotenv import load_dotenv
 
+load_dotenv()
 def xml_to_csv(xml_file, csv_file):
     '''
     Convert XML file to CSV format.
@@ -155,7 +158,7 @@ def get_test_suites(testScenario, vector_DB):
     # D, I = tree.search(np.array(query_embedding), k=5)
     # testSuites = df.iloc[I[0]].to_dict(orient="records")
     
-    testSuites = vector_DB.get_nearest_match("Rently_Testsuites", testScenario, 10)
+    testSuites = vector_DB.get_nearest_match(os.getenv("Weaviate_Tree_Name"), testScenario, 10)
         
     ress = {}
     j=1
