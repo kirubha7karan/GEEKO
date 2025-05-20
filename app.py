@@ -4,8 +4,10 @@ import io
 import random
 import string
 from Gemini import *
+from dotenv import load_dotenv
 # from Ollama import OllamaBot #Uncomment if using Local LLM 
 
+load_dotenv()
 global role, chat, test_assitant, bot
 role = "bot"
 users = {}
@@ -60,7 +62,7 @@ def Chat():
                     # results = test_cases.iloc[I[0]][["externalid", "summary", "preconditions", "combined_text"]].to_dict(orient="records")
                     # print("Faiss Search Results: ", results)
                     
-                    results = vector_DB.get_nearest_match("testing",user_input)
+                    results = vector_DB.get_nearest_match(os.getenv("Weaviate_Collection_Name"),user_input)
                     print("Weaviate Search Results: ", results)
                     
                     user_txt = json.dumps({"query": user_input, "results": results})
@@ -99,7 +101,7 @@ def handle_file_upload():
         try:
             xml_to_csv(xml_content, "./static/knowledge_base.csv")
             # var = set_up_knowledge_base()
-            Pass, fail = vector_DB.load_knowledge_base("testing")
+            Pass, fail = vector_DB.load_knowledge_base(os.getenv("Weaviate_Collection_Name"))
             
             return jsonify({"response": "Testcases Uploaded - "+Pass+" Failed Testcases Upload - "+fail})
         except:

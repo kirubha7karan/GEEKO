@@ -90,11 +90,28 @@ def get_suites(suite_id,suite_name, csv_writer):
 
 
 if __name__ == "__main__":
-    suite_id = 501191
-    # suite_id = 501194
+    suite_id = input("Enter Suite ID: ") #eg: 501194
     
-    suite_name = "Armor"
-    # suite_name = "Login Page"
+    suite_name = input("Enter Suite Name: ") # eg: Login Page
+    
+    Project = input("Enter SmartHome (1) / Rently (2):")
+    looop = True
+    
+    while looop:
+        try:
+            if Project == "1":
+                PROJECT_ID = 244473
+                looop = False
+                
+            elif Project == "2":
+                PROJECT_ID = 258561
+                looop = False
+                
+            else:
+                raise Exception
+        except:
+            Project = input("Enter SmartHome (1) / Rently (2):")
+    
     
     csv_filename = f'{suite_name}_data.csv'
     
@@ -130,5 +147,5 @@ if __name__ == "__main__":
     print(f"Data has been written to {csv_filename}")
 
 kb = Weaviate()
-kb.load_knowledge_base("testings", csv_filename)
+kb.load_knowledge_base(os.getenv("Weaviate_Collection_Name"), csv_filename)
 kb.close_client()

@@ -45,7 +45,7 @@ class GeminiBot:
             
         elif function_name == "generate_testcase":                
             #Semantic search on the test cases to get impacted modules              
-            impactedTestcases = self.vector_DB.get_nearest_match("testing",arguments["testScenario"])
+            impactedTestcases = self.vector_DB.get_nearest_match(os.getenv("Weaviate_Collection_Name"),arguments["testScenario"])
             
             testScenario = {"scenario": arguments["testScenario"], "related testcases":impactedTestcases}
             
