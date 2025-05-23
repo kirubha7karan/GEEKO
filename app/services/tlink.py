@@ -24,7 +24,7 @@ class Tlink:
                 precondition = testcase["preconditions"]
                 steps = testcase["steps"]
                 expected_results = testcase["expected_results"]
-                authorLogin="kirubakaran"
+                authorLogin=os.getenv("TLINK_USER_NAME")
                 
                 self.tlinkClient.initStep(steps[0], expected_results[0], "manual")
                 for j in range(1, len(steps)):

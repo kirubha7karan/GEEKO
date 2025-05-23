@@ -4,6 +4,9 @@ Run this file and assign it to `tlink_tree` list constants.py file
 from testlink import TestlinkAPIClient
 import os
 from dotenv import load_dotenv
+import sys
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 from app.services.Weaviate import Weaviate
 
 load_dotenv()
@@ -46,10 +49,18 @@ def get_test_suites(project_name):
     return testsuites
 
 # Replace 'Your_Project_Name' with your actual project name
-Project = input("Enter Project Name: ") #eg: Master
+# Project = input("Enter Project Name: ") #eg: Master
 
-testsuites = get_test_suites(Project)
+def generate_tree(project_id):
+    try:
+        testsuites = get_test_suites(project_id)
 
-kb = Weaviate()
-kb.load_tlink_tree(os.getenv("Weaviate_Tree_Name"), testsuites)
-kb.close_client()
+        kb = Weaviate()
+        res = kb.load_tlink_tree(os.getenv("Weaviate_Tree_Name"), testsuites)
+        kb.close_client()
+        return res
+    
+    except Exception as e:
+        print(e)
+        return False
+        
