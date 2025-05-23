@@ -49,16 +49,22 @@ class Weaviate:
         return str(Pass), str(Fail)
         
     def load_tlink_tree(self, collection_name, testsuites_hierarchy_list):
-        collection = self.client.collections.get(collection_name)
-        count = len(testsuites_hierarchy_list)
-        print("Total Testsuites count - ",count)
+        try:
+            collection = self.client.collections.get(collection_name)
+            count = len(testsuites_hierarchy_list)
+            print("Total Testsuites count - ",count)
+            
+            for suite in testsuites_hierarchy_list:
+                collection.data.insert(
+                            properties={
+                            "testSuite_name": suite,   
+                        })
+            print(f"{count} testsuites have been added")
+            return True
         
-        for suite in testsuites_hierarchy_list:
-           collection.data.insert(
-                    properties={
-                    "testSuite_name": suite,   
-                })
-        print(f"{count} testsuites have been added")
+        except Exception as e:
+            print(e)
+            return False
     
     def get_nearest_match(self, collection_name, query, limit=5):
         collection = self.client.collections.get(collection_name)

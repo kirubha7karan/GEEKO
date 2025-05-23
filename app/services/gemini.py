@@ -7,6 +7,8 @@ from app.constants import *
 from app.helpers.helper import *
 from app.services.Weaviate import Weaviate
 from dotenv import load_dotenv
+from setup.GenerateTlinkTree import generate_tree
+from setup.Bulk_import_to_weaviate import import_testcases
 
 load_dotenv()
 class GeminiBot:
@@ -33,15 +35,28 @@ class GeminiBot:
         and trigger appropriate function
         '''
             
-        print("Function Call Triggered...")
         function_call = response.candidates[0].content.parts[0].function_call
         function_name = function_call.name
-        print("FUNCTION NAME: "+function_name)
+        print(f"Function: {function_name} triggered with arguments {function_call.args}")
         arguments = function_call.args  # Parse JSON arguments
 
         if function_name == "get_testsuite_id":
             print(response)
             res = get_test_suites(arguments["testScenario"], self.vector_DB)
+        
+        elif function_name == "generate_tlink_tree":
+            result = generate_tree(arguments["project_id"])
+            if result:
+                res = {"result":"Testlink tree imported successfully"}
+            else:
+                res = {"result":"Error in importing testlink tree"}
+        
+        elif function_name == "bulk_importing_testcase":
+            result = import_testcases(arguments["testsuite_id"], arguments["project_id"])
+            if result:
+                res = {"result":"Testlink testcases imported successfully"}
+            else:
+                res = {"result":"Error in importing testlink testcases"}
             
         elif function_name == "generate_testcase":                
             #Semantic search on the test cases to get impacted modules              

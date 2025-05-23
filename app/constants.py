@@ -66,7 +66,7 @@ FUNCTIONS = [
             },
             {
               "name": "get_testsuite_id",
-              "description": "Tool call for getting list of test suite IDs matching the given scenario.\
+              "description": "Tool call for getting list of test suite IDs matching the given scenario. Also trigger this tool call when user want to find **impacted modules**\
                               This tool call will return the testsuite id with path of testsuite in testlink. Provide response as list in markdown format",
                 "parameters": {
                     "type": "object",
@@ -93,7 +93,41 @@ FUNCTIONS = [
                     },
                     "required": ["testScenario"],
                 }
-            }
+            },
+            {
+              "name": "bulk_importing_testcase",
+              "description": "Tool call for importing testcases from testlink.\
+                              This tool call will import all the testcases from the given testsuite and all the testuite inside it",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                      "testsuite_id": {
+                        "type": "string",
+                        "description" : "Test suite id of the testcases in testlink"
+                      },
+                      "project_id":{
+                        "type": "string",
+                        "description" : "project id of the testsuite for importing testcases"
+                      }
+                    },
+                    "required": ["testsuite_id", "project_id"],
+                }
+            },
+            {
+              "name": "generate_tlink_tree",
+              "description": "Tool call for get all the testsuites from the given project.\
+                              This tool call will get all the testuites in a project in a hierarchical format",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                      "project_id": {
+                        "type": "string",
+                        "description" : "project id for importing testsuites"
+                      }
+                    },
+                    "required": ["project_id"],
+                }
+            },
         ]
     }
 ]
