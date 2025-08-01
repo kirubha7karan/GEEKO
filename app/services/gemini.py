@@ -9,6 +9,7 @@ from app.services.Weaviate import Weaviate
 from dotenv import load_dotenv
 from setup.GenerateTlinkTree import generate_tree
 from setup.Bulk_import_to_weaviate import import_testcases
+from app.services.jira_issues import jiraIssues
 
 load_dotenv()
 class GeminiBot:
@@ -16,6 +17,7 @@ class GeminiBot:
         self.client = genai.Client(api_key=os.getenv("GEMINI_KEY"))
         self.create_new_chat(role)
         self.vector_DB = Weaviate()
+        self.jira = jiraIssues()
         
 
     def create_new_chat(self, role):
@@ -23,7 +25,7 @@ class GeminiBot:
         Create a new chat session with the specified role.
         '''
         #tool call will be enabled only when not in Rag mode
-        config = types.GenerateContentConfig(system_instruction=role, tools=FUNCTIONS) if not "test cases" in role else types.GenerateContentConfig(system_instruction=role)
+        config = types.GenerateContentConfig(system_instruction=role, tools=FUNCTIONS) if not "test cases" in role else types.GenerateContentConfig(system_instruction=role, tools=RAG_FUNCTIONS)
         self.chat = self.client.chats.create(
             model="gemini-2.0-flash", 
             config= config
@@ -52,9 +54,9 @@ class GeminiBot:
                 res = {"result":"Error in importing testlink tree"}
         
         elif function_name == "bulk_importing_testcase":
-            result = import_testcases(arguments["testsuite_id"], arguments["project_id"])
+            result, Pass, fail = import_testcases(arguments["testsuite_id"], arguments["project_id"])
             if result:
-                res = {"result":"Testlink testcases imported successfully"}
+                res = {"result":f"Imported {Pass} testcases successfully, {fail} failed to import."}
             else:
                 res = {"result":"Error in importing testlink testcases"}
             
@@ -75,12 +77,23 @@ class GeminiBot:
             
             print("creating testcases")
             print(arguments["generatedTestcases"])
-            tlink.create_testcase(
+            success, msg = tlink.create_testcase(
                     testScenario=arguments["testScenario"],
                     testSuiteID=arguments["testSuiteID"],
                     Testcases = json.loads(arguments["generatedTestcases"]),
                 )
-            return "Created Testcases"
+            if success:
+                return msg
+            else:
+                return "Error in creating testcases: "+msg
+            
+        elif function_name == "get_jira_issue":
+            result = self.jira.get_issue(arguments["issue_key"])
+            if result:
+                res = {"result":"Jira issue fetched successfully", "issue": result}
+            else:
+                res = {"result":"Error in importing testlink tree"}
+        
         else:
             print(f"Function {function_name} not implemented.")
             return "Failed Creatin testcase"

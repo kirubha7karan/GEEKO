@@ -71,7 +71,7 @@ def get_suites(suite_id, csv_writer, project_id):
     try:
         get_test_cases(suite_id, csv_writer, project_id, False)
         child_suites = tlc.getTestSuitesForTestSuite(suite_id)
-        if not child_suites == []: 
+        if not child_suites == []:
             for suite_id, suite_details in child_suites.items():
                 get_test_cases(suite_id, csv_writer, project_id)
         else:
@@ -117,9 +117,9 @@ def import_testcases(suite_id, project_id):
         print(f"Data has been written to {csv_filename}")
 
         kb = Weaviate()
-        kb.load_knowledge_base(os.getenv("Weaviate_Collection_Name"), csv_filename)
+        Pass, Fail = kb.load_knowledge_base(os.getenv("Weaviate_Collection_Name"), csv_filename)
         kb.close_client()
-        return True
+        return True, Pass, Fail
     
     except Exception as e:
         print(e)

@@ -31,8 +31,6 @@ def Chat():
         response_text =""
         user_input = request.json["message"]
         
-        if len(user_input) >200:
-            return jsonify({"response": "Max Input Character is 200"}), 400
         
         test_assist = request.json["testAssistance"]
         

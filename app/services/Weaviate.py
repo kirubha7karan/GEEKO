@@ -66,7 +66,7 @@ class Weaviate:
             print(e)
             return False
     
-    def get_nearest_match(self, collection_name, query, limit=5):
+    def get_nearest_match(self, collection_name, query, limit=20):
         collection = self.client.collections.get(collection_name)
         search_result = collection.query.near_text(query=query, limit=limit)
         # search_result = collection.query.hybrid(query=query, limit=limit)
