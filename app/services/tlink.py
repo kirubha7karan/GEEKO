@@ -31,12 +31,12 @@ class Tlink:
                     self.tlinkClient.appendStep(steps[j], expected_results[j], "manual")
 
                 # Restriction Just in case if the Generate testcase Agent generates more than 5 test cases
-                if i<5:
-                    tc_create = self.tlinkClient.createTestCase(testCaseName, testSuiteID, testProjectID, authorLogin, testCaseName, preconditions=precondition, importance=2, executionType=1, estimatedExecDuration=0)
-                    print(f"Test Case {i} created successfully.")
+                # if i<5:
+                tc_create = self.tlinkClient.createTestCase(testCaseName, testSuiteID, testProjectID, authorLogin, testCaseName, preconditions=precondition, importance=2, executionType=1, estimatedExecDuration=0)
+                print(f"Test Case {i} created successfully.")
                 i+=1
-            return True
+            return True, f"{len(Testcases)} Testcases created successfully."
         
         except Exception as e:
             print(e)
-            return False
+            return False, str(e)

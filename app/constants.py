@@ -1,4 +1,4 @@
-TESTCASE_INSTRUCTIONS = "# TESTCASE_INSTRUCTIONS\
+TESTCASE_INSTRUCTIONS = '# TESTCASE_INSTRUCTIONS\
 \
 Generate structured test cases based on the provided scenario while ensuring:\
 \
@@ -6,7 +6,6 @@ Generate structured test cases based on the provided scenario while ensuring:\
 - The **related testcases** field contains other test cases relevant to the same scenario.\
 - Understand the existing working of flow by analyzing the flow from **related testcases**.\
 - Avoid creating duplicate test cases\
-- Generate 4 testcases Max\
 \
 ## Output Format\
 \
@@ -22,18 +21,18 @@ The output should be in **JSON format** with the following fields:\
 ```json\
 [\
   {\
-    \"test_case_title\": \"Login with valid credentials\",\
-    \"preconditions\": \"User has a valid account.\",\
-    \"steps\": [\
-      \"Open the login page.\",\
-      \"Enter valid username and password and click the login button.\"\
+    "test_case_title": "Login with valid credentials",\
+    "preconditions": "User has a valid account.",\
+    "steps": [\
+      "Open the login page.",\
+      "Enter valid username and password and click the login button."\
     ],\
-    \"expected_results\": [\
-      \"The login page is displayed.\",\
-      \"User successfully logs in and is redirected to the dashboard.\"\
+    "expected_results": [\
+      "The login page is displayed.",\
+      "User successfully logs in and is redirected to the dashboard."\
     ]\
   }\
-]"
+]'
 
 FUNCTIONS = [
     {
@@ -46,87 +45,106 @@ FUNCTIONS = [
                     "properties": {
                         "testScenario": {
                             "type": "string",
-                            "description": "Scenario for which test case is created"
-                          },
+                            "description": "Scenario for which test case is created",
+                        },
                         "testSuiteID": {
                             "type": "string",
-                            "description": "Ask whether user know testsuite ID or not. If user doesn't know testsuite ID, perform `get_testsuite_id` tool call and ask user to choose from list of options provided from that tool call's results"
-                          },
+                            "description": "Ask whether user know testsuite ID or not. If user doesn't know testsuite ID, perform `get_testsuite_id` tool call and ask user to choose from list of options provided from that tool call's results",
+                        },
                         "generatedTestcases": {
                             "type": "string",
-                            "description": "**never ask user for generated testcases unless user himself tells you to ask for** trigger `generate_testcase` tool call with scenario and get this property."
-                          },
+                            "description": "**never ask user for generated testcases unless user himself tells you to ask for** trigger `generate_testcase` tool call with scenario and get this property.",
+                        },
                         "acknowledgement": {
-                            "type":"boolean", 
-                            "description": "user acceptance of generated test cases. Ask User acknowledgement only after sending him the generated testcases"
-                          }
+                            "type": "boolean",
+                            "description": "user acceptance of generated test cases. Ask User acknowledgement only after sending him the generated testcases",
+                        },
                     },
-                    "required": ["testScenario", "testSuiteID", "generatedTestcases", "acknowledgement"],
+                    "required": [
+                        "testScenario",
+                        "testSuiteID",
+                        "generatedTestcases",
+                        "acknowledgement",
+                    ],
                 },
             },
             {
-              "name": "get_testsuite_id",
-              "description": "Tool call for getting list of test suite IDs matching the given scenario. Also trigger this tool call when user want to find **impacted modules**\
+                "name": "get_testsuite_id",
+                "description": "Tool call for getting list of test suite IDs matching the given scenario. Also trigger this tool call when user want to find **impacted modules**\
                               This tool call will return the testsuite id with path of testsuite in testlink. Provide response as list in markdown format",
                 "parameters": {
                     "type": "object",
                     "properties": {
-                      "testScenario": {
-                        "type": "string",
-                        "description" : "Scenario of the testcase (get it from input of create_testcase tool call)"
-                      }
+                        "testScenario": {
+                            "type": "string",
+                            "description": "Scenario of the testcase (get it from input of create_testcase tool call)",
+                        }
                     },
                     "required": ["testScenario"],
-                }
+                },
             },
             {
-              "name": "generate_testcase",
-              "description": "This tool will generate testcase for the given testscenario. It will just generate testcase where\
+                "name": "generate_testcase",
+                "description": "This tool will generate testcase for the given testscenario. It will just generate testcase where\
                               create_testcase will both generate and create testcases in testlink",
                 "parameters": {
                     "type": "object",
                     "properties": {
-                      "testScenario": {
-                        "type": "string",
-                        "description" : "Scenario of the testcase (if possible get it from input of create_testcase tool call)"
-                      }
+                        "testScenario": {
+                            "type": "string",
+                            "description": "Scenario of the testcase (if possible get it from input of create_testcase tool call)",
+                        }
                     },
                     "required": ["testScenario"],
-                }
+                },
             },
             {
-              "name": "bulk_importing_testcase",
-              "description": "Tool call for importing testcases from testlink.\
+                "name": "bulk_importing_testcase",
+                "description": "Tool call for importing testcases from testlink.\
                               This tool call will import all the testcases from the given testsuite and all the testuite inside it",
                 "parameters": {
                     "type": "object",
                     "properties": {
-                      "testsuite_id": {
-                        "type": "string",
-                        "description" : "Test suite id of the testcases in testlink"
-                      },
-                      "project_id":{
-                        "type": "string",
-                        "description" : "project id of the testsuite for importing testcases"
-                      }
+                        "testsuite_id": {
+                            "type": "string",
+                            "description": "Test suite id of the testcases in testlink",
+                        },
+                        "project_id": {
+                            "type": "string",
+                            "description": "project id of the testsuite for importing testcases",
+                        },
                     },
                     "required": ["testsuite_id", "project_id"],
-                }
+                },
             },
             {
-              "name": "generate_tlink_tree",
-              "description": "Tool call for get all the testsuites from the given project.\
+                "name": "generate_tlink_tree",
+                "description": "Tool call for get all the testsuites from the given project.\
                               This tool call will get all the testuites in a project in a hierarchical format",
                 "parameters": {
                     "type": "object",
                     "properties": {
-                      "project_id": {
-                        "type": "string",
-                        "description" : "project id for importing testsuites"
-                      }
+                        "project_id": {
+                            "type": "string",
+                            "description": "project id for importing testsuites",
+                        }
                     },
                     "required": ["project_id"],
-                }
+                },
+            },
+            {
+                "name": "get_jira_issue",
+                "description": "Tool call for getting details of a Jira issue. This tool call will return the issue details including summary, description, and status.",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "issue_key": {
+                            "type": "string",
+                            "description": "Key of the Jira issue to fetch details for",
+                        }
+                    },
+                    "required": ["issue_key"],
+                },
             },
         ]
     }
@@ -150,5 +168,5 @@ You are **Geeko 2.0**, a helpful assitant\
 - Respond politely to general greetings.  \
 - Maintain professionalism and clarity in responses."
 
-#by running `static/GenerateTlinkTree.py` file, add the tlink tree structure here
+# by running `static/GenerateTlinkTree.py` file, add the tlink tree structure here
 tlink_tree = []
